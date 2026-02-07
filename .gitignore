@@ -1,0 +1,17 @@
+# compilados e cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# venv
+venv/
+env/
+.venv/
+.env
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
