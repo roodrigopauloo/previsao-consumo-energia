@@ -9,38 +9,37 @@ from loader_data import load_csv
 
 # PREPARAÇÃO DOS DADOS (Limpeza e Engenharia)
 def preparar_dados(df):
-    print("--- 1. Preparando Dados ---")
+    print("Preparando Dados...")
     
-    # [OPCIONAL] Remoção baseada no PDF (Descomente se quiser usar)
-    # if 'potencia_total_equipamentos' in df.columns:
-    #    df = df.drop('potencia_total_equipamentos', axis=1)
-
     # Engenharia de Atributos
-    df['densidade_habitacional'] = df['num_moradores'] / df['area_m2']
+    if 'num_moradores' in df.columns and 'area_m2' in df.columns:
+        df['densidade_habitacional'] = df['num_moradores'] / df['area_m2']
 
-    # Remoção de Outliers (IQR)
-    Q1 = df['consumo_energia'].quantile(0.25)
-    Q3 = df['consumo_energia'].quantile(0.75)
-    IQR = Q3 - Q1
-    
-    limite_inferior = Q1 - 1.5 * IQR
-    limite_superior = Q3 + 1.5 * IQR
-    
-    df_clean = df[(df['consumo_energia'] >= limite_inferior) & 
-                  (df['consumo_energia'] <= limite_superior)].copy()
-    
-    print(f"Registros originais: {len(df)} -> Após limpeza: {len(df_clean)}")
+    # Remoção de Outliers (IQR) - Apenas se tiver a coluna alvo (treino)
+    if 'consumo_energia' in df.columns:
+        Q1 = df['consumo_energia'].quantile(0.25)
+        Q3 = df['consumo_energia'].quantile(0.75)
+        IQR = Q3 - Q1
+        
+        limite_inferior = Q1 - 1.5 * IQR
+        limite_superior = Q3 + 1.5 * IQR
+        
+        df_clean = df[(df['consumo_energia'] >= limite_inferior) & 
+                      (df['consumo_energia'] <= limite_superior)].copy()
+        
+       # print(f"Registros originais: {len(df)} -> Após limpeza: {len(df_clean)}")
 
-    # Separação X e y
-    X = df_clean.drop('consumo_energia', axis=1)
-    y = df_clean['consumo_energia']
+        # Separação X e y
+        X = df_clean.drop('consumo_energia', axis=1)
+        y = df_clean['consumo_energia']
+        return X, y
     
-    return X, y
+    return df
 
 
 # TREINAMENTO (Escalonamento + MLP)
 def treinar_modelo(X_train, y_train):
-    print("\n--- 2. Treinando Modelo MLP ---")
+    print("\nTreinando Modelo MLP...")
     
     # Escalonamento (Importante: Fit apenas no treino)
     scaler = StandardScaler()
@@ -64,9 +63,7 @@ def treinar_modelo(X_train, y_train):
     
     return mlp, scaler
 
-# ==============================================================================
-# 3. AVALIAÇÃO (Métricas)
-# ==============================================================================
+# AVALIAÇÃO (Métricas)
 def avaliar_modelo(modelo, scaler, X_test, y_test):
     # Aplica o scaler treinado nos dados de teste
     X_test_scaled = scaler.transform(X_test)
@@ -86,9 +83,56 @@ def avaliar_modelo(modelo, scaler, X_test, y_test):
     
     return y_pred, r2
 
+
 # ==============================================================================
-# EXECUÇÃO DO SCRIPT
+# FUNÇÕES PARA USO NO MAIN
 # ==============================================================================
+
+def treinar_pipeline_completo():
+    """
+    Função que o main.py chama para iniciar o sistema.
+    Ela carrega os dados, treina o modelo e devolve a IA pronta.
+    """
+    print("--- [Model] Iniciando treinamento completo... ---")
+    
+    # 1. Carregar CSV
+    df_raw = load_csv()
+    
+    # 2. Preparar Dados
+    X, y = preparar_dados(df_raw)
+    
+    # 3. Treinar Modelo (usa a função interna)
+    modelo_mlp, scaler = treinar_modelo(X, y)
+    
+    return modelo_mlp, scaler
+
+def prever_nova_casa(modelo, scaler, dados_casa):
+    """
+    Recebe os dados de uma casa (dicionário vindo do main.py) e retorna a previsão.
+    """
+    # 1. Converter dicionário para DataFrame
+    df_nova = pd.DataFrame([dados_casa])
+    
+    # 2. ENGENHARIA DE ATRIBUTOS (Tem que ser IGUAL ao treino)
+    if 'area_m2' in df_nova.columns and 'num_moradores' in df_nova.columns:
+        df_nova['densidade_habitacional'] = df_nova['num_moradores'] / df_nova['area_m2']
+    
+    # 3. GARANTIR A ORDEM DAS COLUNAS
+    # O scaler exige as colunas na mesma ordem do treino
+    if hasattr(scaler, 'feature_names_in_'):
+        colunas_treino = scaler.feature_names_in_
+        # Filtra e ordena o dataframe novo (previne erro de colunas extras ou ordem errada)
+        df_nova = df_nova[colunas_treino]
+    
+    # 4. Escalonar
+    dados_scaled = scaler.transform(df_nova)
+    
+    # 5. Prever
+    consumo_estimado = modelo.predict(dados_scaled)[0]
+    
+    return consumo_estimado
+
+#deixar apenas para testar a classe
 if __name__ == "__main__":
     try:
         # 1. Carregar
@@ -100,12 +144,11 @@ if __name__ == "__main__":
         # 3. Dividir
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
-        # 4. Treinar (Retorna o modelo e o scaler usado)
+        # 4. Treinar
         modelo_mlp, scaler_treinado = treinar_modelo(X_train, y_train)
         
         # 5. Avaliar
         y_pred, r2_final = avaliar_modelo(modelo_mlp, scaler_treinado, X_test, y_test)
-        
 
     except Exception as e:
         print(f"Ocorreu um erro crítico na execução: {e}")
