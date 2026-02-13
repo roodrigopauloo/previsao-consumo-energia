@@ -12,7 +12,7 @@ def load_csv ():
     df = pd.read_csv(path_csv)
 
     mapa_ar =  {'Sim': 1, 'Não': 0}
-    mapa_construcao = {'Casa:': 1, 'Apartamento': 0}
+    mapa_construcao = {'Casa': 1, 'Apartamento': 0}
 
 
     df['uso_ar_condicionado'] = df['uso_ar_condicionado'].map(mapa_ar)
