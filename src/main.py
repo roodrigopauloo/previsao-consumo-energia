@@ -9,9 +9,9 @@ except ImportError:
     modelRegression = None
 
 try:
-    import modelClassification
+    import classification_model
 except ImportError:
-    modelClassification = None
+    classification_model = None
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -91,10 +91,10 @@ def main():
         tipo_modelo = "Regressão"
         
     elif escolha == '2':
-        if modelClassification is None:
+        if classification_model is None:
             print("Erro: O arquivo 'modelClassification.py' não foi encontrado.")
             return
-        modulo_selecionado = modelClassification
+        modulo_selecionado = classification_model
         tipo_modelo = "Classificação"
     else:
         print("Opção inválida. Reinicie o programa.")
