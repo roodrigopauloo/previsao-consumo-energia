@@ -29,8 +29,8 @@ Além disso, o projeto oferece uma **página web didática** para que qualquer p
 ## :computer: Rodar a aplicação web
 
 ```bash
-python app.py
-http://127.0.0.1:5000
+python3 app.py
+(ctrl + click) http://127.0.0.1:5000
 ```
 
 ## :globe_with_meridians: Interface Web
