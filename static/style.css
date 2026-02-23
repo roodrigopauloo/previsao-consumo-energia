@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
@@ -13,20 +19,29 @@ body {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+.title {
+    margin: 0 0 10px 0;
+}
+
 input,
 select {
+    /* display: block; */
     width: 100%;
     padding: 10px;
     margin: 10px 0;
+    border: 1px solid #999;
+    border-radius: 2px;
 }
 
 button {
-    padding: 10px;
+    padding: 15px;
     width: 100%;
     background-color: #2d89ef;
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 10px;
+    margin: 10px 0 0 0;
 }
 
 button:hover {
