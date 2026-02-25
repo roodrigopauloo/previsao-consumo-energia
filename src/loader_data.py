@@ -1,23 +1,22 @@
 import pandas as pd
 import pathlib as pl
 
-def load_csv ():
+def load_csv():
     
-    path_init = pl.Path(__file__).parent
-    path_csv = path_init.parent / 'data' / 'dados_consumo_energia.csv'
+    init_path = pl.Path(__file__).parent
+    csv_path = init_path.parent / 'data' / 'dados_consumo_energia.csv'
 
-    if not path_csv.exists():
+    if not csv_path.exists():
         raise FileNotFoundError("Arquivo não encontrado")
     
-    df = pd.read_csv(path_csv)
+    data_frame = pd.read_csv(csv_path)
 
-    mapa_ar =  {'Sim': 1, 'Não': 0}
-    mapa_construcao = {'Casa': 1, 'Apartamento': 0}
+    air_conditioner_map =  {'Sim': 1, 'Não': 0}
+    building_type_map = {'Casa': 1, 'Apartamento': 0}
 
+    data_frame['uso_ar_condicionado'] = data_frame['uso_ar_condicionado'].map(air_conditioner_map)
+    data_frame['tipo_construcao'] =  data_frame['tipo_construcao'].map(building_type_map)
 
-    df['uso_ar_condicionado'] = df['uso_ar_condicionado'].map(mapa_ar)
-    df['tipo_construcao'] =  df['tipo_construcao'].map(mapa_construcao)
+    data_frame = data_frame.fillna(0)
 
-    df = df.fillna(0)
-
-    return df
+    return data_frame
