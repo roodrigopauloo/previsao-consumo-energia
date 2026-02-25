@@ -19,10 +19,10 @@ def classification_module(monkeypatch):
     fake_loader.load_csv = lambda: pd.DataFrame()
     monkeypatch.setitem(sys.modules, "loader_data", fake_loader)
 
-    if "classification_model" in sys.modules:
-        del sys.modules["classification_model"]
+    if "model_classification" in sys.modules:
+        del sys.modules["model_classification"]
 
-    return importlib.import_module("classification_model")
+    return importlib.import_module("model_classification")
 
 
 def test_preparar_dados_classificacao_cria_features_e_labels(classification_module):

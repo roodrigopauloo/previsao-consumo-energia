@@ -134,30 +134,13 @@ def prever_nova_casa(modelo, scaler, dados_casa):
     
     return consumo_estimado
 
-#deixar apenas para testar a classe
+def treinar_e_salvar_modelo():
+    df_raw = load_csv()
+    X, y = preparar_dados(df_raw)
+    X_train, X_test, y_train, y_test = train_test_split(...)
+    modelo, scaler = treinar_modelo(X_train, y_train)
+    avaliar_modelo(modelo, scaler, X_test, y_test)
+    joblib.dump((modelo, scaler), "model/modelo_regressao.pkl")
+
 if __name__ == "__main__":
-    import joblib
-    import os
-
-# Salvar modelo e scaler juntos
-    try:
-        # 1. Carregar
-        df_raw = load_csv()
-        
-        # 2. Preparar
-        X, y = preparar_dados(df_raw)
-        
-        # 3. Dividir
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-        # 4. Treinar
-        modelo_mlp, scaler_treinado = treinar_modelo(X_train, y_train)
-        
-        # 5. Avaliar
-        y_pred, r2_final = avaliar_modelo(modelo_mlp, scaler_treinado, X_test, y_test)
-
-        joblib.dump((modelo_mlp, scaler_treinado), "model/modelo_regressao.pkl")
-        print("Modelo salvo em model/modelo_regressao.pkl")
-    
-    except Exception as e:
-        print(f"Ocorreu um erro crítico na execução: {e}")
+    treinar_e_salvar_modelo()

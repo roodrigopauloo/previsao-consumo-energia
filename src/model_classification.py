@@ -42,11 +42,11 @@ def treinar_classificador(X_train, y_train):
     
     return modelo, scaler
 
-
-if __name__ == "__main__":
+def treinar_classificador_pipeline():
     df = load_csv()
     X, y = preparar_dados_classificacao(df)
-
     modelo, scaler = treinar_classificador(X, y)
-    print("Modelo treinado com sucesso!")
-    print(f"Número de iterações: {modelo.n_iter_}")
+    return modelo, scaler
+
+if __name__ == "__main__":
+    modelo, scaler = treinar_classificador_pipeline()
