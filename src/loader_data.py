@@ -1,14 +1,23 @@
-import pandas as pd
+"""
+Módulo responsável pelo carregamento dos dados.
+"""
+
 import pathlib as pl
+import pandas as pd
 
 def load_csv():
-    
+    """
+    Carrega o arquivo CSV de consumo de energia,
+    realiza mapeamento de variáveis categóricas
+    e retorna um DataFrame tratado.
+    """
+
     init_path = pl.Path(__file__).parent
     csv_path = init_path.parent / 'data' / 'dados_consumo_energia.csv'
 
     if not csv_path.exists():
         raise FileNotFoundError("Arquivo não encontrado")
-    
+
     data_frame = pd.read_csv(csv_path)
 
     air_conditioner_map =  {'Sim': 1, 'Não': 0}
